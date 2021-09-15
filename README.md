@@ -16,3 +16,5 @@ Whether base vCenter or vRA, powershell, ansible or saltstack, we will document 
 [Eric Macintosh](https://twitter.com/this_emac)
 
 Josh Demcher
+
+[Lucho Delorenzi](https://twitter.com/lgdelorenzi)
