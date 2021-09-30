@@ -18,3 +18,9 @@ Whether base vCenter or vRA, powershell, ansible or saltstack, we will document 
 Josh Demcher
 
 [Lucho Delorenzi](https://twitter.com/lgdelorenzi)
+
+
+## Team Picture
+
+[team pic](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/blob/main/windows%20gets%20no%20love.png)
+
