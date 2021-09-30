@@ -71,10 +71,21 @@ I am about to start a POC of saltstack to do this very thing, configure Windows
 what is your experience so far? What have you done for the POC?
 
 
-## For Eric
+## Section For Eric
 
 Document these two methods
 
 for joining to AD, i know we could do that in a customization spec, or in vRA or in some method after the server is provisioned - not sure we want mix those up too with our approaches, but I was going to use the AD integration with vRA (since we don't use that in our env today)
 
 
+## For Doug and Ariel
+
+Find a HOL that builds Windows machines (might be tough!)
+
+Patch and install vRA in the lab
+
+Name:    vcsa7.ariel.lab
+Address:  192.168.3.151
+
+username: administrator@vsphere.local  
+pw: VMware1!
