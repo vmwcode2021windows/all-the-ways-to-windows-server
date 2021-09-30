@@ -24,3 +24,18 @@ Josh Demcher
 
 ![team pic](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/blob/main/windows%20gets%20no%20love.png)
 
+
+## Section for Lucho
+
+vRA8 and Windows 101: Basic walkthrough and documentation links for Windows Server in vRA 8
+
+
+## Section for Wes
+
+I’m interested to see what the others are doing with vRO and saltstack. 
+
+
+I may be able to provide some content on the basic use of cloudbase-init or leveraging ansible tower for config mgmt.
+
+
+
