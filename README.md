@@ -22,5 +22,5 @@ Josh Demcher
 
 ## Team Picture
 
-[team pic](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/blob/main/windows%20gets%20no%20love.png)
+![team pic](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/blob/main/windows%20gets%20no%20love.png)
 
