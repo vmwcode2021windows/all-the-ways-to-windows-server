@@ -1,0 +1,38 @@
+formatVersion: 1
+inputs:
+  os_version:
+    type: string
+    title: Operating System
+  flavor:
+    type: string
+    title: Size
+    enum:
+      - Small
+      - Medium
+      - Large
+  localAdmin:
+    type: string
+    title: Admin
+resources:
+  Cloud_vSphere_Disk_1:
+    type: Cloud.vSphere.Disk
+    properties:
+      capacityGb: 5
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    properties:
+      customizationSpec: joindomain
+      image: '${input.os_version}'
+      flavor: '${input.flavor}'
+      localAdmin: '${input.localAdmin}'
+      networks:
+        - network: '${resource.Cloud_vSphere_Network_1.id}'
+          assignment: static
+      attachedDisks:
+        - source: '${resource.Cloud_vSphere_Disk_1.id}'
+  Cloud_vSphere_Network_1:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'networkprofile:dev'
