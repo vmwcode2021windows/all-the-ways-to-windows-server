@@ -1,4 +1,9 @@
 # All the ways to Windows Server
+
+Team name: Windows gets no love!
+
+It's hard to find vRA 8 examples that are Windows specific. So we're part of the solution. We want to make it easier for others to get up and running from everyone's collective learnings!  
+
 Whether base vCenter or vRA, powershell, ansible or saltstack, we will document all the ways to automate windows server deployments, with a fully prepped image. And then we will also do performance testing to see what scales!
 
 ## Team Members
@@ -30,7 +35,7 @@ Yes, Ariel is soulfully singing to the team
 
 vRA8 and Windows 101: Basic walkthrough and documentation links for Windows Server in vRA 8
 
-Taken from Slack:
+### The goal
 
 so im doing vRA + Cloudbase-init -> whats the end goal? what should our windows image be able to do? a couple ideas:   
 1: initialize disks that have been added as part of the deployment  
@@ -47,11 +52,88 @@ configure IP/network on the guest if that's not already a given
 
 Use of an IPAM I believe requires the use of vsphere custom specs? Currently, I'm using cloudbase-init to do my naming and IP addressing on the guest, then using ansible to do disk initialization and domain joins. I agree that #3 would make me happy - is the goal to get to #3 via multiple methods? ansible, saltstack, etc?
 
+### A basic walkthrough -  here's a mix of cloudbase-init and vSphere Customization Specification to customize a Windows Deployment in vRA 8
+
+1. First of all, the image needs to be prepared for cloudbase-init to be used 
+
+Documentation: https://docs.vmware.com/en/vRealize-Automation/8.4/Using-and-Managing-Cloud-Assembly/GUID-6A17EBEA-F9C3-486F-81DD-210EA065E92F.html 
+
+Important caveats: A pending sysprep state in the image might cause the customization specification done by vRA when deploying to fail when disconnecting and reconnecting the network interface. If customization specification will be used as well as cloudbase-init, then the sysprep checkbox should be left unchecked 
+
+A customization specification will be triggered in the following scenarios: 
+
+- Manually selecting a customization specification that was created in vSphere with for example, instructions to Join AD 
+
+- If the network has a static assignment. vRA will create and execute a 'phantom' customization specification to configure the network 
+
+
+To make both work, the following needs to happen: 
+
+- A customization specification that is not the 'phantom' one is created in vSphere 
+
+- Do not select the option to Sysprep the template after cloudbase-init installation 
+
+- Set cloudbase-init service to 'disabled' after completing the installation 
+
+- Add a 'Run Once' command to the customization specification with the following code 
+
+`powershell -command "Start-Process cmd -ArgumentList '/c sc config cloudbase-init start= auto && net start cloudbase-init' -Verb runas" `
+
+- Select 'Log in automatically as administrator' 
+
+
+This process will keep cloudbase-init disabled until after the commands in sysprep have completed, which is after the last reboot. Then cloudbase-init will kick in and run whatever is there. 
+ 
+
+2: Creating a cloud template that contains both customization specification as well as cloudbase-init commands 
+
+For example, if we wanted to use a static assignment create a simple file, and then run a script that is located in a network location (for example, to install software), this is what the VM resource in the blueprint would look like: 
+
+
+resources: 
+
+  Cloud_Machine_1: 
+    type: Cloud.Machine 
+    properties: 
+      image: '${input.image}' 
+      flavor: '${input.size}' 
+      customizeGuestOs: true 
+      newName: '${input.hostname}' 
+      customizationSpec: '${input.customSpec}' 
+      cloudConfig: | 
+        #cloud-config 
+        write_files: 
+          content: Cloudbase-Init test 
+          path: C:\test.txt         
+          runcmd: 
+            - xcopy \\'${input.scriptLocation}'\scripts\script.ps1 C:\script.ps1 
+            - powershell.exe C:\script.ps1 
+      networks: 
+        - assignment: static 
+          network: '${resource.Cloud_Network_1.id}' 
+ 
+
+In this case, the inputs are image, size, hostname, customSpec and scriptLocation.  
+
+So if we were to deploy this VM, it would have 
+
+- Static IP Assignment (from an IPAM, either internal or external) 
+
+- Will be joined to the domain using the Customization Specification  
+
+- Will create a file, copy a script from the network, and then run it 
+
+
+The commands that are run from within cloudbase-init are endless. You can then install/configure software, connect to other servers, or perform any additional configuration you can imagine 
+
+ 
 ## Section by Wes
 
 I may be able to provide some content on the basic use of cloudbase-init or leveraging ansible tower for config mgmt.
 
 [Dealing with Cloudbase-init](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/tree/main/cloudbase-init)
+
+Who did you like better, Lucho's or Wes's ?
 
 ### Things to learn
 
