@@ -127,7 +127,7 @@ The project has been given access to provision in the required cloud zones.  The
 
 ![Naming Template](images/naming%20template.png?raw=true)
 
-#### Event Broker
+## Event Broker
 There are three Event Broker Subscriptions configured for this process, each for the Compute Provision Post event (after the server has been provisioned)
 * Add Local Admin (calls vRO)
 * Format Disk (calls ABX)
