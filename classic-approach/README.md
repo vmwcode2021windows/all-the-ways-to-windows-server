@@ -199,6 +199,8 @@ This ABX action works similar to the vRO workflows, but is less modular.  It's w
 * Prepares a script to initialize/format the disk and assign to E: drive
 * Uses invoke-vmscript to run the script on the VM (user/pwd params stored as Action Constants)
 
+Action Constants for ABX are similar to Config Elements in vRO. They provide you a central location to create variables/values which can be shared across multiple actions.
+
 ![Action Constants](images/action%20constants.png?raw=true)
 
 ```
