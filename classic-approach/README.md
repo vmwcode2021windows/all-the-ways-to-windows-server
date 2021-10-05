@@ -108,23 +108,47 @@ There are three flavor mappings defined
 ![Flavor Mappings](images/flavor%20mappings.png?raw=true)
 
 #### Network Profiles
-There is one network profile defined, consisting of two networks.  Each network has IP Ranges defined.  In this particular set up, vRA is acting as the IPAM and will choose an available IP for the server build.
+There is one network profile defined, consisting of two networks.  Each network has IP Ranges defined.  In this particular set up, vRA is acting as the IPAM and will choose an available IP for the server build.  Due to restrictions in this lab, each network only has one IP defined in the range.
 
-![Network Profiles](images/network%20profiles.png?raw=true)
+![Network Profiles](images/network%20profile.png?raw=true)
 
 #### Active Directory Integration
 The Active Directory integration was added and configured to point to a valid AD instance.  And an OU was specified for the Project that will be building servers.
+
+![AD Integration](images/ad%20integration.png?raw=true)
+
+![AD Project](images/ad%20project.png?raw=true)
 
 With this integration, vRA will pre-create the computer account for a server build by this project in the OU specified.  This integration supports the ability to overwrite the OU or skip the integration entirely with additional settings in a cloud template.
 
 #### Project
 The project has been given access to provision in the required cloud zones.  The project has also been given a simple default naming convention, so the user doesn't need to specify a server name during the build process.
 
+![Naming Template](images/naming%20template.png?raw=true)
+
 #### Event Broker
 There are three Event Broker Subscriptions configured for this process, each for the Compute Provision Post event (after the server has been provisioned)
 * Add Local Admin (calls vRO)
 * Format Disk (calls ABX)
 * Install Notepad++ (calls vRO)
+
+All three subscriptions are set to Blocking, which tells vRA that they can each only run one at a time.  To determine the order in which they run, the priority is set differently for each.  In general, for each event topic, all of the blocking subscriptions will run first in the order determined by their priority (and as documented by VMware when priorities are shared).  Once they are finished, all Non-Blocking subscriptions for that event topic will then run at the same time.
+
+So when work needs to happen in a certain order, it can.  But for work that is not dependent on other items, they can run at once at the end.
+
+![Subscriptions](images/subscriptions.png?raw=true)
+
+![Subscription](images/subscription.png?raw=true)
+
+### Event Broker Payload
+A quick note about the payload that is passed from the Event Broker to an ABX Action or a vRO Workflow.  In ABX, that payload is installed in the $inputs parameter of the handler function.  In vRO, the workflow should be configured with an input called inputProperties of type Properties.
+
+Each event topic has a documented set of inputs that are included in the paylod.  Some of those properties are writable and can therefore be sent back to the Event Broker as outputs.  When working with the Event Broker, it is helpful to inspect/log those variables to get a better understanding of what information is available.
+
+A common use case is to access the custom properties of a template, which is included in the payload for most provisionging topics.  For example, accessed like this in a vRO worklow:
+```
+var customProps = inputProperties.customProperties
+```
 
 #### vRO - Add Local Admin
 This workflow:
