@@ -51,10 +51,53 @@ There are four custom properties on the machine object
 * localAdmin (from the localAdmin input)
 * customizationSpec (an os customization spec in vcenter that includes domain join)
 
+```
+formatVersion: 1
+inputs:
+  os_version:
+    type: string
+    title: Operating System
+  flavor:
+    type: string
+    title: Size
+    enum:
+      - Small
+      - Medium
+      - Large
+  localAdmin:
+    type: string
+    title: Admin
+resources:
+  Cloud_vSphere_Disk_1:
+    type: Cloud.vSphere.Disk
+    properties:
+      capacityGb: 5
+  Cloud_vSphere_Machine_1:
+    type: Cloud.vSphere.Machine
+    properties:
+      customizationSpec: joindomain
+      image: '${input.os_version}'
+      flavor: '${input.flavor}'
+      localAdmin: '${input.localAdmin}'
+      networks:
+        - network: '${resource.Cloud_vSphere_Network_1.id}'
+          assignment: static
+      attachedDisks:
+        - source: '${resource.Cloud_vSphere_Disk_1.id}'
+  Cloud_vSphere_Network_1:
+    type: Cloud.vSphere.Network
+    properties:
+      networkType: existing
+      constraints:
+        - tag: 'networkprofile:dev'
+ ``` 
 #### Image Mapping
 There are two flavor mappings defined for the cloud account, they each point to a valid template in vCenter:
 * win2k16
-* win2k19 
+* win2k19
+
+![Alt text](images/image%20mappings.png?raw=true)
+
 
 #### Flavor Mappings
 There are three flavor mappings defined
@@ -62,8 +105,12 @@ There are three flavor mappings defined
 * Medium
 * Large
 
+![Flavor Mappings](images/flavor%20mappings.png?raw=true)
+
 #### Network Profiles
 There is one network profile defined, consisting of two networks.  Each network has IP Ranges defined.  In this particular set up, vRA is acting as the IPAM and will choose an available IP for the server build.
+
+![Network Profiles](images/network%20profiles.png?raw=true)
 
 #### Active Directory Integration
 The Active Directory integration was added and configured to point to a valid AD instance.  And an OU was specified for the Project that will be building servers.
@@ -86,6 +133,17 @@ This workflow:
 * Uses built-in workflow to get the VM Object with that name
 * Uses built-in workflow to run a program on the guest OS, passing the local path powershell and the script as arguments
 
+```
+vmname = inputProperties.resourceNames[0];
+var admin = inputProperties.customProperties["localAdmin"];
+
+scriptArgs =  '"';
+scriptArgs += "Add-LocalGroupMember -Group Administrators -Member '" + admin + "'";
+scriptArgs += '"';
+```
+
+*See Install Notepad++ section below for workflow screenshots, as these are pretty similar.*
+
 #### vRO - Install Notepad++
 This workflow works nearly the same as the one to add a local adminstrator
 * Parses the server name from the inputProperties payload
@@ -93,8 +151,59 @@ This workflow works nearly the same as the one to add a local adminstrator
 * Uses built-in workflow to get the VM Object with that name
 * Uses built-in workflow to run a program on the guest OS, passing the local path powershell and the script as arguments
 
+![Install Npp](images/install%20npp%20-%20variables.png?raw=true)
+
+![Install Npp](images/install%20npp%20-%20schema.png?raw=true)
+
+```
+vmname = inputProperties.resourceNames[0];
+scriptArgs =  '"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12';
+scriptArgs += ";Invoke-WebRequest -Uri " + nppPath + " -Outfile C:\\npp.exe";
+scriptArgs += ';C:\\npp.exe /S"';
+```
+
 #### ABX - Format Drive
 This ABX action works similar to the vRO workflows, but is less modular.  It's written in PowerShell
 * Connects to the vCenter (user/pwd params stored as Action Constants)
 * Prepares a script to initialize/format the disk and assign to E: drive
 * Uses invoke-vmscript to run the script on the VM (user/pwd params stored as Action Constants)
+
+![Action Constants](images/action%20constants.png?raw=true)
+
+```
+function handler($context, $inputs) {
+    
+    $vmname = $inputs.resourceNames[0]
+
+    # Build Credentials, stored as Action Constants
+    $user = $inputs["vcUser"]
+    $pass = $context.getSecret($inputs["vcPassword"])
+    $secPass = ConvertTo-SecureString $pass -AsPlainText -Force
+    $cred = New-Object System.Management.Automation.PSCredential ($user, $secPass)
+    
+    $osUser = $inputs["osUser"]
+    $osPass = $context.getSecret($inputs["osPassword"])
+    $osSecPass = ConvertTo-SecureString $osPass -AsPlainText -Force
+    $osCred = New-Object System.Management.Automation.PSCredential ($osUser, $osSecPass)
+    write-host "oscred"
+
+    # Ignore cert errors for this powerCLI session
+    Set-PowerCLIConfiguration -Scope Session -InvalidCertificateAction Ignore -Confirm:$false
+
+    # Connect to the vcenter
+    $vc = connect-viserver -server "vsphere.local" -credential $cred
+
+    # Get the vm object 
+    $vm = get-vm $vmname -server $vc
+
+	  # Create a script that can be run on the vm to initialize/format the disk
+    $script =  '$disk = get-disk | ? {$_.PartitionStyle -eq "Raw"} | select -first 1;'
+    $script += 'initialize-disk -inputobject $disk;'
+    $script += '$p = new-partition $disk.number -UseMaximumSize -AssignDriveLetter:$false;'
+    $script += '$p | Format-Volume -FileSystem NTFS -Confirm:$false;' 
+    $script += '$p | Set-Partition -NewDriveLetter "E"'
+    
+	  # Invoke the script on the vm
+    $result = invoke-vmscript -vm $vm -ScriptText $script -GuestCredential $osCred
+}
+```
