@@ -15,7 +15,7 @@ Cloud Template | The "blueprint" for the server deployment - consists of the bui
 Image Mappings | Defines the machine templates to use for a build
 Flavor Mappings | Defines the size of a server build (cpu/mem)
 Network Profile | Defining available networks and ranges for a deployment
-ACtive Directory Integration | Allows for accounts to be created in AD
+Active Directory Integration | Allows for accounts to be created in AD
 Event Broker Subscription | Entry point to into different phases of the build process
 ABX Actions | Custom code that can be called by an Event Broker Subscription
 vRO Workflows | Custom workflows that can be called by an Event Broker Subscription
@@ -26,15 +26,12 @@ Without wading into the weeds, these are the steps that make up this classic app
 1. Based on the tagging strategy, the compute for the server will be chosen
 1. Based on tagging, the network for the server will be used
 1. The account will be pre-created in Active Directory
-1. The server will be provisioned in vCenter
+1. The server will be provisioned in vCenter and join Active Directory
 1. An account will be added to the local admin group with a vRO workflow
 1. The attached disk will be intialized/formatted with an ABX action
 1. Notepad++ will be installed on the server with a vRO workflow
 
-## Components
-In this section, we'll elaborate a bit more on some of the components.
-
-#### Cloud Template
+## Cloud Template
 The cloud template consists of three objects:
 * Cloud.vSphere.Machine
 * Cloud.vSphere.Network
@@ -91,15 +88,15 @@ resources:
       constraints:
         - tag: 'networkprofile:dev'
  ``` 
-#### Image Mapping
+## Image Mapping
 There are two flavor mappings defined for the cloud account, they each point to a valid template in vCenter:
 * win2k16
 * win2k19
 
-![Alt text](images/image%20mappings.png?raw=true)
+![Image Mappings](images/image%20mappings.png?raw=true)
 
 
-#### Flavor Mappings
+## Flavor Mappings
 There are three flavor mappings defined
 * Small
 * Medium
@@ -107,12 +104,16 @@ There are three flavor mappings defined
 
 ![Flavor Mappings](images/flavor%20mappings.png?raw=true)
 
-#### Network Profiles
+## Network Profiles
 There is one network profile defined, consisting of two networks.  Each network has IP Ranges defined.  In this particular set up, vRA is acting as the IPAM and will choose an available IP for the server build.  Due to restrictions in this lab, each network only has one IP defined in the range.
 
 ![Network Profiles](images/network%20profile.png?raw=true)
 
-#### Active Directory Integration
+![Networks](images/networks.png?raw=true)
+
+![IP Range](images/ip%20range.png?raw=true)
+
+## Active Directory Integration
 The Active Directory integration was added and configured to point to a valid AD instance.  And an OU was specified for the Project that will be building servers.
 
 ![AD Integration](images/ad%20integration.png?raw=true)
@@ -121,7 +122,7 @@ The Active Directory integration was added and configured to point to a valid AD
 
 With this integration, vRA will pre-create the computer account for a server build by this project in the OU specified.  This integration supports the ability to overwrite the OU or skip the integration entirely with additional settings in a cloud template.
 
-#### Project
+## Project
 The project has been given access to provision in the required cloud zones.  The project has also been given a simple default naming convention, so the user doesn't need to specify a server name during the build process.
 
 ![Naming Template](images/naming%20template.png?raw=true)
@@ -140,7 +141,7 @@ So when work needs to happen in a certain order, it can.  But for work that is n
 
 ![Subscription](images/subscription.png?raw=true)
 
-### Event Broker Payload
+## Event Broker Payload
 A quick note about the payload that is passed from the Event Broker to an ABX Action or a vRO Workflow.  In ABX, that payload is installed in the $inputs parameter of the handler function.  In vRO, the workflow should be configured with an input called inputProperties of type Properties.
 
 Each event topic has a documented set of inputs that are included in the paylod.  Some of those properties are writable and can therefore be sent back to the Event Broker as outputs.  When working with the Event Broker, it is helpful to inspect/log those variables to get a better understanding of what information is available.
@@ -150,7 +151,7 @@ A common use case is to access the custom properties of a template, which is inc
 var customProps = inputProperties.customProperties
 ```
 
-#### vRO - Add Local Admin
+## vRO - Add Local Admin
 This workflow:
 * Parses the server name and local admin account from inputProperties payload
 * Prepares a PowerShell script to add the account to local admins
@@ -168,16 +169,22 @@ scriptArgs += '"';
 
 *See Install Notepad++ section below for workflow screenshots, as these are pretty similar.*
 
-#### vRO - Install Notepad++
+## vRO - Install Notepad++
 This workflow works nearly the same as the one to add a local adminstrator
 * Parses the server name from the inputProperties payload
 * Prepares a PowerShell script to download and install Notepad++
 * Uses built-in workflow to get the VM Object with that name
 * Uses built-in workflow to run a program on the guest OS, passing the local path powershell and the script as arguments
 
-![Install Npp](images/install%20npp%20-%20variables.png?raw=true)
+It can be very handy to use Config Elements and their Attributes to create re-usable variables.  These elements are shared by workflows and can be re-used easily.  This will help to avoid hard-coding values in multiple workflows, which can be problematic when those values need to change in the future.
 
-![Install Npp](images/install%20npp%20-%20schema.png?raw=true)
+![Install Npp Inputs](images/install%20npp%20-%20inputs.png?raw=true)
+
+![Install Npp Vars](images/install%20npp%20-%20variables.png?raw=true)
+
+![Install Npp Schema](images/install%20npp%20-%20schema.png?raw=true)
+
+![Config Element](images/config%20element.png?raw=true)
 
 ```
 vmname = inputProperties.resourceNames[0];
@@ -186,7 +193,7 @@ scriptArgs += ";Invoke-WebRequest -Uri " + nppPath + " -Outfile C:\\npp.exe";
 scriptArgs += ';C:\\npp.exe /S"';
 ```
 
-#### ABX - Format Drive
+## ABX - Format Drive
 This ABX action works similar to the vRO workflows, but is less modular.  It's written in PowerShell
 * Connects to the vCenter (user/pwd params stored as Action Constants)
 * Prepares a script to initialize/format the disk and assign to E: drive
