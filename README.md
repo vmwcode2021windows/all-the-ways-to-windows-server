@@ -66,12 +66,12 @@ A: That was the same behavior I encountered as well. I'm sure there's a better w
 
 ## Section for Greg
 
-Talk about managing Windows fleet. Patching, documentation, and maybe even PowerBI
+Greg talks to us about managing a Windows fleet and how to get started with SaltStack. He has a really good video on the first topic here - patching, documentation, and reporting with PowerBI  
 [Greg's PowerBI video](https://www.youtube.com/watch?v=7mWjs1hDKGE)
 
-I am about to start a POC of saltstack to do this very thing, configure Windows
+Greg is just starting with SaltStack so he's looking for collaboration. He created a section with examples and provided a general overview:
 
-what is your experience so far? What have you done for the POC?
+[Starting with SaltStack for Windows](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/tree/main/SaltStack)  
 
 
 ## Section For Eric
@@ -81,11 +81,19 @@ Document these two methods
 for joining to AD, i know we could do that in a customization spec, or in vRA or in some method after the server is provisioned - not sure we want mix those up too with our approaches, but I was going to use the AD integration with vRA (since we don't use that in our env today)
 
 
-## For Doug and Ariel
+## Additional resources
 
-Find a HOL that builds Windows machines (might be tough!)
+Some HOLs that may help:  
 
-Patch and install vRA in the lab
+Lightning lab:  
+https://docs.hol.vmware.com/HOL-2020/hol-2021-91-ism_html_en/
+
+
+This one has integration with an IPAM and other extensibility examples  
+https://docs.hol.vmware.com/HOL-2020/hol-2021-03-cmp_html_en/
+
+
+## If we ever get the lab running
 
 Name:    vcsa7.ariel.lab
 Address:  192.168.3.151
