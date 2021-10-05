@@ -47,18 +47,21 @@ configure IP/network on the guest if that's not already a given
 
 Use of an IPAM I believe requires the use of vsphere custom specs? Currently, I'm using cloudbase-init to do my naming and IP addressing on the guest, then using ansible to do disk initialization and domain joins. I agree that #3 would make me happy - is the goal to get to #3 via multiple methods? ansible, saltstack, etc?
 
-## Section for Wes
-
-I’m interested to see what the others are doing with vRO and saltstack. 
-
+## Section by Wes
 
 I may be able to provide some content on the basic use of cloudbase-init or leveraging ansible tower for config mgmt.
 
-Explain this better:
+[Dealing with Cloudbase-init](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/tree/main/cloudbase-init)
 
-For those of you that use cloudbase-init, when the OVF plugin/module does its thing after first boot, I noticed it mounts an XML file to the DVDROM drive. why does that stick around after reboots? is there a way to remove it/tell cb-init to stop attempting to check for any config
+### Things to learn
 
-That was the same behavior I encountered as well. I'm sure there's a better way, but I simply created an ABX action in vRA that triggers on the post-provision phase of a build. The action basically runs a powercli command to disconnect the CD rom of the provisioned VM. I'm all ears to better methods though
+I’m interested to see what the others are doing with vRO and saltstack. 
+
+### Some typical problems Wes brought up and that he handled in his section
+
+Q: For those of you that use cloudbase-init, when the OVF plugin/module does its thing after first boot, I noticed it mounts an XML file to the DVDROM drive. why does that stick around after reboots? is there a way to remove it/tell cb-init to stop attempting to check for any config
+
+A: That was the same behavior I encountered as well. I'm sure there's a better way, but I simply created an ABX action in vRA that triggers on the post-provision phase of a build. The action basically runs a powercli command to disconnect the CD rom of the provisioned VM. I'm all ears to better methods though
 
 
 ## Section for Greg
