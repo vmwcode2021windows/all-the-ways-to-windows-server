@@ -31,7 +31,7 @@ Josh Demcher
 
 Yes, Ariel is soulfully singing to the team
 
-## Section for Lucho
+## Section provided by Lucho
 
 vRA8 and Windows 101: Basic walkthrough and documentation links for Windows Server in vRA 8
 
@@ -92,25 +92,24 @@ For example, if we wanted to use a static assignment create a simple file, and t
 
 resources: 
 
-  Cloud_Machine_1: 
-    type: Cloud.Machine 
-    properties: 
-      image: '${input.image}' 
-      flavor: '${input.size}' 
-      customizeGuestOs: true 
-      newName: '${input.hostname}' 
-      customizationSpec: '${input.customSpec}' 
-      cloudConfig: | 
-        #cloud-config 
-        write_files: 
-          content: Cloudbase-Init test 
-          path: C:\test.txt         
-          runcmd: 
-            - xcopy \\'${input.scriptLocation}'\scripts\script.ps1 C:\script.ps1 
-            - powershell.exe C:\script.ps1 
-      networks: 
-        - assignment: static 
-          network: '${resource.Cloud_Network_1.id}' 
+  Cloud_Machine_1:  
+    type: Cloud.Machine  
+    properties:  
+      image: '${input.image}'  
+      flavor: '${input.size}'  
+      customizeGuestOs: true  
+      newName: '${input.hostname}'  
+      customizationSpec: '${input.customSpec}'  
+      cloudConfig: |  
+        #cloud-config   
+        write_files:  
+          content: Cloudbase-Init test  
+          path: C:\test.txt  
+          runcmd:  
+            - xcopy \\'${input.scriptLocation}'\scripts\script.ps1 C:\script.ps1 - powershell.exe C:\script.ps1  
+      networks:  
+        - assignment: static  
+          network: '${resource.Cloud_Network_1.id}'  
  
 
 In this case, the inputs are image, size, hostname, customSpec and scriptLocation.  
@@ -127,7 +126,7 @@ So if we were to deploy this VM, it would have
 The commands that are run from within cloudbase-init are endless. You can then install/configure software, connect to other servers, or perform any additional configuration you can imagine 
 
  
-## Section by Wes
+## Section provided by Wes
 
 I may be able to provide some content on the basic use of cloudbase-init or leveraging ansible tower for config mgmt.
 
@@ -146,7 +145,7 @@ Q: For those of you that use cloudbase-init, when the OVF plugin/module does its
 A: That was the same behavior I encountered as well. I'm sure there's a better way, but I simply created an ABX action in vRA that triggers on the post-provision phase of a build. The action basically runs a powercli command to disconnect the CD rom of the provisioned VM. I'm all ears to better methods though
 
 
-## Section for Greg
+## Section provided by Greg
 
 Greg talks to us about managing a Windows fleet and how to get started with SaltStack. He has a really good video on the first topic here - patching, documentation, and reporting with PowerBI  
 [Greg's PowerBI video](https://www.youtube.com/watch?v=7mWjs1hDKGE)
@@ -156,9 +155,11 @@ Greg is just starting with SaltStack so he's looking for collaboration. He creat
 [Starting with SaltStack for Windows](https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/tree/main/SaltStack)  
 
 
-## Section For Eric
+## Section provided by Eric
 
-Document these two methods
+Eric provided an excellent section that goes into more detail using vRO and some of the classical approaches, but in vRA8
+
+https://github.com/vmwcode2021windows/all-the-ways-to-windows-server/tree/main/classic-approach  
 
 for joining to AD, i know we could do that in a customization spec, or in vRA or in some method after the server is provisioned - not sure we want mix those up too with our approaches, but I was going to use the AD integration with vRA (since we don't use that in our env today)
 
@@ -167,9 +168,8 @@ for joining to AD, i know we could do that in a customization spec, or in vRA or
 
 Some HOLs that may help:  
 
-Lightning lab:  
+Lightning lab to get familiar with vRA 8 concepts:  
 https://docs.hol.vmware.com/HOL-2020/hol-2021-91-ism_html_en/
-
 
 This one has integration with an IPAM and other extensibility examples  
 https://docs.hol.vmware.com/HOL-2020/hol-2021-03-cmp_html_en/
