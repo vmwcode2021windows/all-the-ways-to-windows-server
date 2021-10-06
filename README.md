@@ -33,11 +33,12 @@ Yes, Ariel is soulfully singing to the team
 
 ## Section provided by Lucho
 
-vRA8 and Windows 101: Basic walkthrough and documentation links for Windows Server in vRA 8
 
 ### The goal
 
-so im doing vRA + Cloudbase-init -> whats the end goal? what should our windows image be able to do? a couple ideas:   
+Lucho kicked off the internal discussion of what we wanted to achieve:
+
+vRA + Cloudbase-init -> whats the end goal? what should our windows image be able to do? a couple ideas:   
 1: initialize disks that have been added as part of the deployment  
 2: join to AD  
 3: adding an AD group to local administrators  
