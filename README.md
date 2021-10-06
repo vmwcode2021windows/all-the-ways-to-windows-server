@@ -1,6 +1,6 @@
 # All the ways to Windows Server
 
-Team name: **Windows gets no love!**
+Team name: **Windows gets no love!**  :dizzy_face:  :pleading_face:  :sweat:
 
 It's hard to find vRA 8 examples that are Windows specific. So we're part of the solution. We want to make it easier for others to get up and running from everyone's collective learnings!  
 
