@@ -39,13 +39,13 @@ Yes, Ariel is soulfully singing to the team
 Lucho kicked off the internal discussion of what we wanted to achieve:
 
 vRA + Cloudbase-init -> whats the end goal? what should our windows image be able to do? a couple ideas:   
-1: initialize disks that have been added as part of the deployment  
-2: join to AD  
-3: adding an AD group to local administrators  
-4: download X software from Y location (could very well be installing an IIS role and then downloading a page from somewhere and editing the index file)  
-5: install that software  
-6: configure that software  
-7: execute some kind of test to see everything is working  
+1. initialize disks that have been added as part of the deployment  
+2. join to AD  
+3. adding an AD group to local administrators  
+4. download X software from Y location (could very well be installing an IIS role and then downloading a page from somewhere and editing the index file)  
+5. install that software  
+6. configure that software  
+7. execute some kind of test to see everything is working  
 
 I'd be happy if we can get to #3 but also installing a license, creating the computer account in the right OU, and enabling rdp
 
