@@ -48,7 +48,7 @@ There are four custom properties on the machine object
 * localAdmin (from the localAdmin input)
 * customizationSpec (an os customization spec in vcenter that includes domain join)
 
-```
+```yaml
 formatVersion: 1
 inputs:
   os_version:
@@ -147,7 +147,7 @@ A quick note about the payload that is passed from the Event Broker to an ABX Ac
 Each event topic has a documented set of inputs that are included in the paylod.  Some of those properties are writable and can therefore be sent back to the Event Broker as outputs.  When working with the Event Broker, it is helpful to inspect/log those variables to get a better understanding of what information is available.
 
 A common use case is to access the custom properties of a template, which is included in the payload for most provisionging topics.  For example, accessed like this in a vRO worklow:
-```
+```javascript
 var customProps = inputProperties.customProperties
 ```
 
@@ -158,7 +158,7 @@ This workflow:
 * Uses built-in workflow to get the VM Object with that name
 * Uses built-in workflow to run a program on the guest OS, passing the local path powershell and the script as arguments
 
-```
+```javascript
 vmname = inputProperties.resourceNames[0];
 var admin = inputProperties.customProperties["localAdmin"];
 
@@ -186,7 +186,7 @@ It can be very handy to use Config Elements and their Attributes to create re-us
 
 ![Config Element](images/config%20element.png?raw=true)
 
-```
+```javascript
 vmname = inputProperties.resourceNames[0];
 scriptArgs =  '"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12';
 scriptArgs += ";Invoke-WebRequest -Uri " + nppPath + " -Outfile C:\\npp.exe";
@@ -203,7 +203,7 @@ Action Constants for ABX are similar to Config Elements in vRO. They provide you
 
 ![Action Constants](images/action%20constants.png?raw=true)
 
-```
+```powershell
 function handler($context, $inputs) {
     
     $vmname = $inputs.resourceNames[0]
